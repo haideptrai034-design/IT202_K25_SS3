@@ -1,0 +1,33 @@
+🔎 Phân tích & Đề xuất
+Giải pháp 1: Hard Delete
+DELETE FROM ORDERS
+WHERE Status = 'Canceled';
+●	Xóa hẳn dữ liệu khỏi bảng.
+●	Giải phóng dung lượng ổ cứng.
+●	Tăng tốc độ truy vấn vì dữ liệu ít hơn.
+●	Nhưng mất lịch sử, không thể đối soát khi kiểm toán.
+Giải pháp 2: Soft Delete
+ALTER TABLE ORDERS ADD is_deleted TINYINT(1) DEFAULT 0;
+
+UPDATE ORDERS
+SET is_deleted = 1
+WHERE Status = 'Canceled';
+●	Không xóa dữ liệu, chỉ đánh dấu.
+●	Dữ liệu vẫn tồn tại để phục vụ kiểm toán.
+●	Truy vấn thông thường cần thêm điều kiện WHERE is_deleted = 0.
+●	Không giải phóng dung lượng, nhưng vẫn đảm bảo tính vẹn toàn lịch sử.
+ 
+📊 So sánh Ưu/Nhược điểm
+Tiêu chí	Hard Delete	Soft Delete
+Giải phóng dung lượng	✅ Có	❌ Không
+Tốc độ truy vấn	✅ Nhanh	⚠️ Phụ thuộc vào điều kiện lọc
+Lịch sử kế toán	❌ Mất	✅ Giữ nguyên
+ 
+✅ Lựa chọn giải pháp
+Trong bối cảnh siêu thị cần lưu trữ lịch sử kiểm toán, giải pháp Soft Delete là phù hợp nhất. Nó vừa giúp hệ thống “ẩn” đơn hủy khỏi truy vấn thường ngày, vừa đảm bảo dữ liệu vẫn còn để đối soát.
+ 
+ 
+🎯 Kết quả mong muốn
+●	Người dùng bình thường: chỉ thấy đơn hàng hợp lệ (is_deleted=0).
+●	Phòng kế toán: vẫn có thể truy xuất toàn bộ dữ liệu khi cần kiểm toán.
+
